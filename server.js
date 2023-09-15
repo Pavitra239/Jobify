@@ -5,17 +5,18 @@ import express from "express";
 import mongoose from "mongoose";
 import morgan from "morgan";
 import { nanoid } from "nanoid";
-
+import cookieParser from "cookie-parser";
+import { authenticateUser } from "./middlewares/authMiddleware.js";
 // Routes
 import jobRouter from "./routes/jobRouter.js";
-
+import userRouter from "./routes/userRoutes.js";
+import authRouter from "./routes/authRoutes.js";
 // middlewares
 import errorHandlerMiddleware from "./middlewares/errorHandlerMiddleware.js";
-import { BadRequestError } from "./errors/customErrors.js";
-
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
@@ -26,7 +27,13 @@ app.get("/", (req, res) => {
 });
 
 // Job Routes
-app.use("/api/v1/jobs", jobRouter);
+app.use("/api/v1/jobs", authenticateUser, jobRouter);
+
+// User Routes
+app.use("/api/v1/users", authenticateUser, userRouter);
+
+// Auth Routes
+app.use("/api/v1/auth", authRouter);
 
 // 404
 app.use("*", (req, res) => {
