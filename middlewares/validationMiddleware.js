@@ -40,7 +40,7 @@ export const validateJobInput = withValidationErrors([
 ]);
 
 export const validateIdParam = withValidationErrors([
-  param("id").custom(async (value) => {
+  param("id").custom(async (value, { req }) => {
     const isValid = await mongoose.Types.ObjectId.isValid(value);
     if (!isValid) throw new BadRequestError("Invalid MongoDB ID");
     const job = await Job.findById(value);
@@ -88,7 +88,7 @@ export const validateUpdateUserInput = withValidationErrors([
     .withMessage("Email is required")
     .isEmail()
     .withMessage("invalid Email Format")
-    .custom(async (value) => {
+    .custom(async (value, { req }) => {
       const user = await User.findOne({ email: value });
       if (user && user._id.toString() !== req.user.userId) {
         throw new BadRequestError("Email already exists");

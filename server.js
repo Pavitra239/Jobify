@@ -3,8 +3,8 @@ import * as dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import mongoose from "mongoose";
+import { v2 as cloudinary } from "cloudinary";
 import morgan from "morgan";
-import { nanoid } from "nanoid";
 import cookieParser from "cookie-parser";
 import { authenticateUser } from "./middlewares/authMiddleware.js";
 // Routes
@@ -13,8 +13,15 @@ import userRouter from "./routes/userRoutes.js";
 import authRouter from "./routes/authRoutes.js";
 // middlewares
 import errorHandlerMiddleware from "./middlewares/errorHandlerMiddleware.js";
-const app = express();
 
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_SECRET,
+});
+
+const app = express();
+app.use(express.static("public"));
 app.use(express.json());
 app.use(cookieParser());
 
